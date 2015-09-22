@@ -3,14 +3,12 @@ package com.myhealth.measurementemulator.measurementemulator;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -18,7 +16,11 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
+    // Debugging tag
     public static final String TAG = MainActivity.class.getSimpleName();
+
+    // The Connector class
+    private BluetoothConnector connector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,12 +33,6 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        TextView text = (TextView) findViewById(R.id.mainText);
-        text.setText("Button pressed");
-        new Thread(new BlueToothConnector()).start();
     }
 
     @Override
@@ -54,13 +50,77 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void discoverBlueTooth(View view) {
-        Log.d(TAG, "Button pressed");
-        TextView text = (TextView) findViewById(R.id.mainText);
-        Log.d(TAG, "Text changed");
-        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-        Log.d(TAG, "Intent created");
-        startActivityForResult(discoverableIntent, 1);
+    /**
+     * Turn Bluetooth on
+     *
+     * @param view
+     */
+    public void turnOnBluetooth(View view) {
+        if (connector != null) {
+            connector.stop();
+        } else {
+            connector = new BluetoothConnector();
+        }
+        new Thread(connector).start();
+    }
+
+    /**
+     * Inner class to implement listening to incoming bluetooth connections
+     */
+    private class BluetoothConnector implements Runnable {
+
+        // The UUID for connecting
+        private static final String UUID_STRING = "34824060-611f-11e5-a837-0800200c9a66";
+        // The server socket
+        private BluetoothServerSocket tmp;
+        // The bluetooth socket
+        private BluetoothSocket connection;
+
+        @Override
+        public void run() {
+            // Create a bluetooth adapter and turn it on
+            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (!mBluetoothAdapter.isEnabled()) {
+                mBluetoothAdapter.enable();
+            }
+            try {
+                // Listen to incoming connections
+                tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("MeasurementEmulator", UUID.fromString(UUID_STRING));
+                giveStatusUpdate(getString(R.string.listening_started));
+                connection = tmp.accept(30000);
+                tmp.close();
+                giveStatusUpdate(getString(R.string.connection_success));
+                // Test data
+                connection.getOutputStream().write("Hello from the other device!".getBytes());
+            } catch (final IOException e) {
+                Log.d(MainActivity.TAG, e.getMessage());
+            }
+        }
+
+        /**
+         * Stop trying to connect
+         */
+        public void stop() {
+            if (tmp != null) {
+                try {
+                    tmp.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        /**
+         * Give a status update using Toast.
+         *
+         * @param text The text to display
+         */
+        private void giveStatusUpdate(final String text) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 }
