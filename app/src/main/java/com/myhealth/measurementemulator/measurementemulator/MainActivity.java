@@ -3,24 +3,26 @@ package com.myhealth.measurementemulator.measurementemulator;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.Button;
 
 import java.io.IOException;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Debugging tag
+    // Logging tag
     public static final String TAG = MainActivity.class.getSimpleName();
+    public static final int DISCOVERABLE_TIME = 30;
 
-    // The Connector class
-    private BluetoothConnector connector;
+    // The connector thread
+    private BlueToothConnector connector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +38,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (connector != null) {
+            connector.cancel();
+        }
+        Log.d(TAG, "Start a new thread");
+        connector = new BlueToothConnector();
+        new Thread(connector).start();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -46,81 +58,91 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     /**
-     * Turn Bluetooth on
+     * Turn on discoverability and wait for the result
      *
-     * @param view
+     * @param view The view that triggered the method
      */
-    public void turnOnBluetooth(View view) {
-        if (connector != null) {
-            connector.stop();
-        } else {
-            connector = new BluetoothConnector();
-        }
-        new Thread(connector).start();
+    public void discoverBlueTooth(View view) {
+        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, DISCOVERABLE_TIME);
+        startActivityForResult(discoverableIntent, 1);
     }
 
     /**
-     * Inner class to implement listening to incoming bluetooth connections
+     * Send data over bluetooth
+     *
+     * @param view
      */
-    private class BluetoothConnector implements Runnable {
+    public void sendData(View view) {
+        try {
+            connector.sendData("Hello from the other device!\n");
+            connector.cancel();
+        } catch (IOException e) {
+            Log.d(TAG, e.getMessage());
+        }
+    }
 
-        // The UUID for connecting
+    /**
+     * Set the possibility of sending data
+     */
+    private void setSendDataVisibility(final int visibility) {
+        if (visibility != View.VISIBLE && visibility != View.INVISIBLE) return;
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Button button = (Button) findViewById(R.id.send_button);
+                button.setVisibility(visibility);
+            }
+        });
+    }
+
+    /**
+     * Inner class to handle an incoming connection
+     */
+    private class BlueToothConnector implements Runnable {
+
+        // Unique identifier necessary for a connection
         private static final String UUID_STRING = "34824060-611f-11e5-a837-0800200c9a66";
-        // The server socket
-        private BluetoothServerSocket tmp;
-        // The bluetooth socket
-        private BluetoothSocket connection;
+        // The socket to send data over
+        private BluetoothSocket socket;
 
         @Override
         public void run() {
-            // Create a bluetooth adapter and turn it on
             BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (!mBluetoothAdapter.isEnabled()) {
-                mBluetoothAdapter.enable();
-            }
+            BluetoothServerSocket tmp = null;
             try {
-                // Listen to incoming connections
                 tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("MeasurementEmulator", UUID.fromString(UUID_STRING));
-                giveStatusUpdate(getString(R.string.listening_started));
-                connection = tmp.accept(30000);
-                tmp.close();
-                giveStatusUpdate(getString(R.string.connection_success));
-                // Test data
-                connection.getOutputStream().write("Hello from the other device!".getBytes());
-            } catch (final IOException e) {
-                Log.d(MainActivity.TAG, e.getMessage());
+                socket = tmp.accept(30000);
+                setSendDataVisibility(View.VISIBLE);
+            } catch (IOException e) {
+                Log.d(TAG, e.getMessage());
             }
         }
 
         /**
-         * Stop trying to connect
-         */
-        public void stop() {
-            if (tmp != null) {
-                try {
-                    tmp.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        /**
-         * Give a status update using Toast.
+         * Send a string of data over the bluetooth connection
          *
-         * @param text The text to display
+         * @param data
          */
-        private void giveStatusUpdate(final String text) {
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
-                }
-            });
+        public void sendData(String data) throws IOException {
+            if (socket == null) {
+                Log.d(TAG, "HOW ARE YOU NULL");
+            }
+            socket.getOutputStream().write(data.getBytes());
+        }
+
+        /**
+         * Cancel an ongoing connection
+         */
+        public void cancel() {
+            try {
+                socket.close();
+                setSendDataVisibility(View.INVISIBLE);
+            } catch (Exception e) {
+            }
         }
     }
 }
