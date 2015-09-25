@@ -13,12 +13,15 @@ import android.view.View;
 import android.widget.Button;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
     // Logging tag
     public static final String TAG = MainActivity.class.getSimpleName();
+    // The amount of time to make this device discoverable
     public static final int DISCOVERABLE_TIME = 30;
 
     // The connector thread
@@ -41,9 +44,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (connector != null) {
             connector.cancel();
+        } else {
+            connector = new BlueToothConnector();
         }
         Log.d(TAG, "Start a new thread");
-        connector = new BlueToothConnector();
         new Thread(connector).start();
     }
 
@@ -75,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Send data over bluetooth
      *
-     * @param view
+     * @param view The view that triggered this method
      */
     public void sendData(View view) {
         try {
@@ -112,25 +116,27 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            BluetoothServerSocket tmp = null;
+            BluetoothServerSocket tmp;
             try {
                 tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("MeasurementEmulator", UUID.fromString(UUID_STRING));
                 socket = tmp.accept(30000);
+                tmp.close();
+                mBluetoothAdapter.cancelDiscovery();
                 setSendDataVisibility(View.VISIBLE);
             } catch (IOException e) {
-                Log.d(TAG, e.getMessage());
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                Log.d(TAG, sw.toString());
             }
         }
 
         /**
          * Send a string of data over the bluetooth connection
          *
-         * @param data
+         * @param data The data to send over bluetooth
          */
         public void sendData(String data) throws IOException {
-            if (socket == null) {
-                Log.d(TAG, "HOW ARE YOU NULL");
-            }
             socket.getOutputStream().write(data.getBytes());
         }
 
@@ -139,9 +145,11 @@ public class MainActivity extends AppCompatActivity {
          */
         public void cancel() {
             try {
+                Log.d(TAG, "CLOSE");
                 socket.close();
                 setSendDataVisibility(View.INVISIBLE);
             } catch (Exception e) {
+                // Do nothing
             }
         }
     }
