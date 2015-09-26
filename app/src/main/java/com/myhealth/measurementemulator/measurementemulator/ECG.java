@@ -11,17 +11,17 @@ import java.util.Random;
  */
 public class ECG {
 
-    public static int MEASURES_PER_DECISECOND = 10;
-    public static int MINIMUM_PAUSE = 3*MEASURES_PER_DECISECOND;
-    public static int EVERAGE_PWave = 4;
-    public static int PWaveSpeed = 4;
-    public static int MINIMUM_PRSegemnt = (int)0.2*MEASURES_PER_DECISECOND;
-    public static int EVERAGE_QRS = 12;
-    public static int MINIMUM_STSegemnt = (int)0.2*MEASURES_PER_DECISECOND;
-    public static int EVERAGE_TWave = 6;
-    public static int TWaveSpeed = 6;
-    public static int EVERAGE_UWave = 1;
-    public static int UWaveSpeed = 8;
+    public static final int MEASURES_PER_DECISECOND = 10;
+    public static final int MINIMUM_PAUSE = 3*MEASURES_PER_DECISECOND;
+    public static final int EVERAGE_P_WAVE = 4;
+    public static final int P_WAVE_SPEED = 4;
+    public static final int MINIMUM_PRSegemnt = (int)0.2*MEASURES_PER_DECISECOND;
+    public static final int EVERAGE_QRS = 12;
+    public static final int MINIMUM_STSegemnt = (int)0.2*MEASURES_PER_DECISECOND;
+    public static final int EVERAGE_TWave = 6;
+    public static final int T_WAVE_SPEED = 6;
+    public static final int EVERAGE_U_WAVE = 1;
+    public static final int U_WAVE_SPEED = 8;
 
     private int maxDuration;
     private List<Double> values = new ArrayList<>();
@@ -64,7 +64,7 @@ public class ECG {
      * Adds a U.wave to the current timeline.
      */
     private void generateUWave( ) {
-        createWave(UWaveSpeed, EVERAGE_UWave);
+        createWave(U_WAVE_SPEED, EVERAGE_U_WAVE);
 
     }
 
@@ -72,7 +72,7 @@ public class ECG {
      * Adds a T wave to the current timeline.
      */
     private void generateTWave( ) {
-        createWave(TWaveSpeed, EVERAGE_TWave);
+        createWave(T_WAVE_SPEED, EVERAGE_TWave);
 
     }
 
@@ -104,19 +104,12 @@ public class ECG {
 
     }
 
-    /**
-     * @return the current ECG.
-     */
-    public List<Double> getECG(){
-        return this.values;
-    }
-
 
     /**
      * Adds a P.wave to the current timeline.
      */
     private void generatePWave(){
-        createWave(PWaveSpeed, EVERAGE_PWave);
+        createWave(P_WAVE_SPEED, EVERAGE_P_WAVE);
     }
 
     /**
