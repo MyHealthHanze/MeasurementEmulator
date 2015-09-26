@@ -1,95 +1,54 @@
 package com.myhealth.measurementemulator.measurementemulator;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothServerSocket;
-import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
-import java.io.IOException;
-import java.util.UUID;
-
+/**
+ * The first an only activity of Measurement Emulator
+ */
 public class MainActivity extends AppCompatActivity {
 
-    // Logging tag
-    public static final String TAG = MainActivity.class.getSimpleName();
-    public static final int DISCOVERABLE_TIME = 30;
-
     // The connector thread
-    private BlueToothConnector connector;
+    private BluetoothPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        presenter = new BluetoothPresenter(this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (connector != null) {
-            connector.cancel();
-        }
-        Log.d(TAG, "Start a new thread");
-        connector = new BlueToothConnector();
-        new Thread(connector).start();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        presenter.startListening();
     }
 
     /**
-     * Turn on discoverability and wait for the result
+     * Make the device discoverable
      *
      * @param view The view that triggered the method
      */
-    public void discoverBlueTooth(View view) {
-        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, DISCOVERABLE_TIME);
-        startActivityForResult(discoverableIntent, 1);
+    public void discoverBluetooth(View view) {
+        presenter.turnDiscoveryOn();
     }
 
     /**
      * Send data over bluetooth
      *
-     * @param view
+     * @param view The view that triggered this method
      */
-    public void sendData(View view) {
-        try {
-            connector.sendData("Hello from the other device!\n");
-            connector.cancel();
-        } catch (IOException e) {
-            Log.d(TAG, e.getMessage());
-        }
+    public void sendGeneratedData(View view) {
+        presenter.generateData();
     }
 
     /**
      * Set the possibility of sending data
      */
-    private void setSendDataVisibility(final int visibility) {
+    public void setSendDataVisibility(final int visibility) {
         if (visibility != View.VISIBLE && visibility != View.INVISIBLE) return;
         runOnUiThread(new Runnable() {
             public void run() {
@@ -100,49 +59,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Inner class to handle an incoming connection
+     * Set the status message
+     *
+     * @param status The status message
      */
-    private class BlueToothConnector implements Runnable {
-
-        // Unique identifier necessary for a connection
-        private static final String UUID_STRING = "34824060-611f-11e5-a837-0800200c9a66";
-        // The socket to send data over
-        private BluetoothSocket socket;
-
-        @Override
-        public void run() {
-            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            BluetoothServerSocket tmp = null;
-            try {
-                tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("MeasurementEmulator", UUID.fromString(UUID_STRING));
-                socket = tmp.accept(30000);
-                setSendDataVisibility(View.VISIBLE);
-            } catch (IOException e) {
-                Log.d(TAG, e.getMessage());
+    public void setStatus(final String status) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                TextView text = (TextView) findViewById(R.id.status_text);
+                text.setText(status);
             }
-        }
-
-        /**
-         * Send a string of data over the bluetooth connection
-         *
-         * @param data
-         */
-        public void sendData(String data) throws IOException {
-            if (socket == null) {
-                Log.d(TAG, "HOW ARE YOU NULL");
-            }
-            socket.getOutputStream().write(data.getBytes());
-        }
-
-        /**
-         * Cancel an ongoing connection
-         */
-        public void cancel() {
-            try {
-                socket.close();
-                setSendDataVisibility(View.INVISIBLE);
-            } catch (Exception e) {
-            }
-        }
+        });
     }
 }
