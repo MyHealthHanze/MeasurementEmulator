@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 /**
  * Created by Sander on 26-9-2015.
@@ -70,7 +69,7 @@ public class BluetoothPresenter {
      */
     public void generateData() {
 
-        Measurement measurement = creatMeasurement();
+        Measurement measurement = createMeasurement();
         Gson gson = new Gson();
         String json = gson.toJson(measurement);
         try {
@@ -81,7 +80,7 @@ public class BluetoothPresenter {
         }
     }
 
-    private Measurement creatMeasurement(){
+    private Measurement createMeasurement(){
         Measurement measurement = new Measurement();
         //generate BMP
         measurement.setBpm(new BPM().getNewBPM());
