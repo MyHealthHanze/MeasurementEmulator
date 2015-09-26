@@ -65,7 +65,6 @@ public class ECG {
      */
     private void generateUWave( ) {
         createWave(U_WAVE_SPEED, EVERAGE_U_WAVE);
-
     }
 
     /**
@@ -73,7 +72,6 @@ public class ECG {
      */
     private void generateTWave( ) {
         createWave(T_WAVE_SPEED, EVERAGE_T_WAVE);
-
     }
 
     /**
@@ -101,9 +99,7 @@ public class ECG {
                 }
             }
         }
-
     }
-
 
     /**
      * Adds a P.wave to the current timeline.
@@ -132,5 +128,4 @@ public class ECG {
             }
         }
     }
-
 }
