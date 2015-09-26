@@ -11,15 +11,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * The first an only activity of Measurement Emulator
+ */
 public class MainActivity extends AppCompatActivity {
 
     // Logging tag
-    public static final String TAG = MainActivity.class.getSimpleName();
-    public static final int DISCOVERABLE_TIME = 30;
+    private static final String TAG = MainActivity.class.getSimpleName();
+    // The amount of time to be discoverable
+    private static final int DISCOVERABLE_TIME = 30;
+    // The default status message
+    private String defaultStatus;
 
     // The connector thread
     private BlueToothConnector connector;
@@ -28,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        defaultStatus = getString(R.string.press) + getString(R.string.bluetooth_string) + getString(R.string.incoming_connection);
+        setStatus(defaultStatus);
     }
 
     @Override
@@ -62,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Turn on discoverability and wait for the result
+     * Make the device discoverable
      *
      * @param view The view that triggered the method
      */
@@ -75,11 +84,11 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Send data over bluetooth
      *
-     * @param view
+     * @param view The view that triggered this method
      */
-    public void sendData(View view) {
+    public void sendGeneratedData(View view) {
         try {
-            connector.sendData("Hello from the other device!\n");
+            connector.sendString("Hello from the other device!\n");
             connector.cancel();
         } catch (IOException e) {
             Log.d(TAG, e.getMessage());
@@ -100,6 +109,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Set the status message
+     *
+     * @param status The status message
+     */
+    private void setStatus(final String status) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                TextView text = (TextView) findViewById(R.id.status_text);
+                text.setText(status);
+            }
+        });
+    }
+
+    /**
      * Inner class to handle an incoming connection
      */
     private class BlueToothConnector implements Runnable {
@@ -109,14 +132,21 @@ public class MainActivity extends AppCompatActivity {
         // The socket to send data over
         private BluetoothSocket socket;
 
+        /**
+         * Wait for an incoming connection
+         */
         @Override
         public void run() {
             BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            BluetoothServerSocket tmp = null;
+            BluetoothServerSocket tmp;
             try {
+                setStatus(getString(R.string.waiting_connection));
                 tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("MeasurementEmulator", UUID.fromString(UUID_STRING));
                 socket = tmp.accept(30000);
+                tmp.close();
+                mBluetoothAdapter.cancelDiscovery();
                 setSendDataVisibility(View.VISIBLE);
+                setStatus(getString(R.string.connected_to) + socket.getRemoteDevice().getName());
             } catch (IOException e) {
                 Log.d(TAG, e.getMessage());
             }
@@ -125,12 +155,9 @@ public class MainActivity extends AppCompatActivity {
         /**
          * Send a string of data over the bluetooth connection
          *
-         * @param data
+         * @param data The data to send
          */
-        public void sendData(String data) throws IOException {
-            if (socket == null) {
-                Log.d(TAG, "HOW ARE YOU NULL");
-            }
+        public void sendString(String data) throws IOException {
             socket.getOutputStream().write(data.getBytes());
         }
 
@@ -141,7 +168,9 @@ public class MainActivity extends AppCompatActivity {
             try {
                 socket.close();
                 setSendDataVisibility(View.INVISIBLE);
+                setStatus(defaultStatus);
             } catch (Exception e) {
+                // Do nothing
             }
         }
     }
