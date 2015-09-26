@@ -15,10 +15,10 @@ public class ECG {
     public static final int MINIMUM_PAUSE = 3*MEASURES_PER_DECISECOND;
     public static final int EVERAGE_P_WAVE = 4;
     public static final int P_WAVE_SPEED = 4;
-    public static final int MINIMUM_PRSegemnt = (int)0.2*MEASURES_PER_DECISECOND;
+    public static final int MINIMUM_PR_SEGMENT = (int)0.2*MEASURES_PER_DECISECOND;
     public static final int EVERAGE_QRS = 12;
-    public static final int MINIMUM_STSegemnt = (int)0.2*MEASURES_PER_DECISECOND;
-    public static final int EVERAGE_TWave = 6;
+    public static final int MINIMUM_ST_SEGMENT = (int)0.2*MEASURES_PER_DECISECOND;
+    public static final int EVERAGE_T_WAVE = 6;
     public static final int T_WAVE_SPEED = 6;
     public static final int EVERAGE_U_WAVE = 1;
     public static final int U_WAVE_SPEED = 8;
@@ -37,9 +37,9 @@ public class ECG {
         generatePause(MINIMUM_PAUSE);
         while(values.size() < this.maxDuration){
             generatePWave();
-            generatePause(MINIMUM_PRSegemnt);
+            generatePause(MINIMUM_PR_SEGMENT);
             generateQRSComplex();
-            generatePause(MINIMUM_STSegemnt);
+            generatePause(MINIMUM_ST_SEGMENT);
             generateTWave();
             generateUWave();
             generatePause(MINIMUM_PAUSE);
@@ -72,7 +72,7 @@ public class ECG {
      * Adds a T wave to the current timeline.
      */
     private void generateTWave( ) {
-        createWave(T_WAVE_SPEED, EVERAGE_TWave);
+        createWave(T_WAVE_SPEED, EVERAGE_T_WAVE);
 
     }
 
