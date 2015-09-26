@@ -8,7 +8,11 @@ import android.util.Log;
 import android.view.View;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 /**
  * Created by Sander on 26-9-2015.
@@ -20,6 +24,8 @@ public class BluetoothPresenter {
     private static final String TAG = MainActivity.class.getSimpleName();
     // The amount of time to be discoverable
     private static final int DISCOVERABLE_TIME = 30;
+    //duration of ECG in deciseconds
+    private int duration = 40;
     // The default status message
     private String defaultStatus;
     // The activity to manage
@@ -63,12 +69,29 @@ public class BluetoothPresenter {
      * Generate data and send it
      */
     public void generateData() {
+
+        Measurement measurement = creatMeasurement();
+        Gson gson = new Gson();
+        String json = gson.toJson(measurement);
         try {
-            connector.sendString("Hello again from the other device\n");
+            connector.sendString(json);
             connector.cancel();
         } catch (IOException e) {
             // Do nothing
         }
+    }
+
+    private Measurement creatMeasurement(){
+        Measurement measurement = new Measurement();
+        //generate BMP
+        measurement.setBpm(new BPM().getNewBPM());
+        //generate BP
+        measurement.setBp(new BP().getNewBP());
+        //generate ECG
+        List<Double> list = new ECG().getNewECG(duration);
+        Double[] ecgArray = list.toArray(new Double[list.size()]);
+        measurement.setEcg(ecgArray);
+        return measurement;
     }
 
 
