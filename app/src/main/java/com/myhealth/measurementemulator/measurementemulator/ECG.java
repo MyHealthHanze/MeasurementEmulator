@@ -15,9 +15,9 @@ public class ECG {
     public static final int MINIMUM_PAUSE = 3*MEASURES_PER_DECISECOND;
     public static final int EVERAGE_P_WAVE = 4;
     public static final int P_WAVE_SPEED = 4;
-    public static final int MINIMUM_PR_SEGMENT = (int)0.2*MEASURES_PER_DECISECOND;
+    public static final int MINIMUM_PR_SEGMENT = (int)(0.2*MEASURES_PER_DECISECOND);
     public static final int EVERAGE_QRS = 12;
-    public static final int MINIMUM_ST_SEGMENT = (int)0.2*MEASURES_PER_DECISECOND;
+    public static final int MINIMUM_ST_SEGMENT = (int)(0.2*MEASURES_PER_DECISECOND);
     public static final int EVERAGE_T_WAVE = 6;
     public static final int T_WAVE_SPEED = 6;
     public static final int EVERAGE_U_WAVE = 1;
