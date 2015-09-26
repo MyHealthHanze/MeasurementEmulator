@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:onClick="discoverBlueTooth"
+        android:onClick="discoverBluetooth"
         android:text="@string/bluetooth_string" />
 
     <Button
