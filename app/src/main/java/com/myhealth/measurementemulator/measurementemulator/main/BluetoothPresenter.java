@@ -1,4 +1,4 @@
-package com.myhealth.measurementemulator.measurementemulator;
+package com.myhealth.measurementemulator.measurementemulator.main;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
@@ -7,11 +7,16 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 
+import com.google.gson.Gson;
+import com.myhealth.measurementemulator.measurementemulator.R;
+import com.myhealth.measurementemulator.measurementemulator.measurement.BP;
+import com.myhealth.measurementemulator.measurementemulator.measurement.BPM;
+import com.myhealth.measurementemulator.measurementemulator.measurement.ECG;
+import com.myhealth.measurementemulator.measurementemulator.measurement.Measurement;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
-
-import com.google.gson.Gson;
 
 /**
  * Created by Sander on 26-9-2015.
@@ -68,7 +73,6 @@ public class BluetoothPresenter {
      * Generate data and send it
      */
     public void generateData() {
-
         Measurement measurement = createMeasurement();
         Gson gson = new Gson();
         String json = gson.toJson(measurement);
@@ -76,11 +80,12 @@ public class BluetoothPresenter {
             connector.sendString(json);
             connector.cancel();
         } catch (IOException e) {
-            // Do nothing
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
         }
     }
 
-    private Measurement createMeasurement(){
+    private Measurement createMeasurement() {
         Measurement measurement = new Measurement();
         //generate BMP
         measurement.setBpm(new BPM().getNewBPM());
@@ -120,7 +125,7 @@ public class BluetoothPresenter {
                 activity.setSendDataVisibility(View.VISIBLE);
                 activity.setStatus(activity.getString(R.string.connected_to) + socket.getRemoteDevice().getName());
             } catch (IOException e) {
-                Log.d(TAG, e.getMessage());
+                Log.d(TAG, e.toString());
             }
         }
 
@@ -130,7 +135,12 @@ public class BluetoothPresenter {
          * @param data The data to send
          */
         public void sendString(String data) throws IOException {
+            if (!data.endsWith("\n")) {
+                data += "\n";
+            }
             socket.getOutputStream().write(data.getBytes());
+            // Always send an empty line to let the other side know we're done
+            socket.getOutputStream().write("\n".getBytes());
         }
 
         /**

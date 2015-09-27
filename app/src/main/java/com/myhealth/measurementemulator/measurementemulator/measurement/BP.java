@@ -1,4 +1,4 @@
-package com.myhealth.measurementemulator.measurementemulator;
+package com.myhealth.measurementemulator.measurementemulator.measurement;
 
 import java.util.Random;
 
