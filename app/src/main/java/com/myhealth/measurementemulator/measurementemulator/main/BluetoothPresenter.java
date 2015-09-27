@@ -15,6 +15,9 @@ import com.myhealth.measurementemulator.measurementemulator.measurement.ECG;
 import com.myhealth.measurementemulator.measurementemulator.measurement.Measurement;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -95,6 +98,10 @@ public class BluetoothPresenter {
         List<Double> list = new ECG().getNewECG(duration);
         Double[] ecgArray = list.toArray(new Double[list.size()]);
         measurement.setEcg(ecgArray);
+        // Get the date and time
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        dateFormatter.setLenient(false);
+        measurement.setDateTime(dateFormatter.format(new Date()));
         return measurement;
     }
 
@@ -125,6 +132,7 @@ public class BluetoothPresenter {
                 activity.setSendDataVisibility(View.VISIBLE);
                 activity.setStatus(activity.getString(R.string.connected_to) + socket.getRemoteDevice().getName());
             } catch (IOException e) {
+                cancel();
                 Log.d(TAG, e.toString());
             }
         }

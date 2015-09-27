@@ -8,6 +8,7 @@ public class Measurement {
     private Double[] ecg;
     private int bpm;
     private int[] bp;
+    private String dateTime;
 
     public Double[] getEcg() {
         return this.ecg;
@@ -31,5 +32,13 @@ public class Measurement {
 
     public void setBp(int[] bp) {
         this.bp = bp;
+    }
+
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
     }
 }
