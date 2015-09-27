@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.myhealth.measurementemulator.measurementemulator.R;
 
 /**
- * The first an only activity of Measurement Emulator
+ * The first and only activity of Measurement Emulator
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
      * @param view The view that triggered this method
      */
     public void sendGeneratedData(View view) {
-        presenter.generateData();
+        presenter.generateAndSendData();
     }
 
     /**

@@ -75,10 +75,11 @@ public class BluetoothPresenter {
     /**
      * Generate data and send it
      */
-    public void generateData() {
+    public void generateAndSendData() {
         Measurement measurement = createMeasurement();
         Gson gson = new Gson();
         String json = gson.toJson(measurement);
+        Log.d(TAG, json);
         try {
             connector.sendString(json);
             connector.cancel();
