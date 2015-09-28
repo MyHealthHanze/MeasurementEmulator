@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.myhealth.measurementemulator.measurementemulator.R;
@@ -39,23 +38,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Send data over bluetooth
-     *
-     * @param view The view that triggered this method
-     */
-    public void sendGeneratedData(View view) {
-        presenter.generateAndSendData();
-    }
-
-    /**
      * Set the possibility of sending data
      */
     public void setSendDataVisibility(final int visibility) {
         if (visibility != View.VISIBLE && visibility != View.INVISIBLE) return;
         runOnUiThread(new Runnable() {
             public void run() {
-                Button button = (Button) findViewById(R.id.send_button);
-                button.setVisibility(visibility);
+                findViewById(R.id.send_ecg_button).setVisibility(visibility);
+                findViewById(R.id.send_bp_button).setVisibility(visibility);
+                findViewById(R.id.send_bpm_button).setVisibility(visibility);
+                findViewById(R.id.done_button).setVisibility(visibility);
+                if (visibility == View.VISIBLE) {
+                    findViewById(R.id.bluetooth_button).setVisibility(View.INVISIBLE);
+                } else {
+                    findViewById(R.id.bluetooth_button).setVisibility(View.VISIBLE);
+                }
             }
         });
     }
@@ -72,5 +69,41 @@ public class MainActivity extends AppCompatActivity {
                 text.setText(status);
             }
         });
+    }
+
+    /**
+     * Start sending an ECG measurement over bluetooth
+     *
+     * @param view The view that triggered this method
+     */
+    public void sendECGData(View view) {
+        presenter.generateAndSendECG();
+    }
+
+    /**
+     * Start sending a BPM measurement over bluetooth
+     *
+     * @param view The view that triggered this method
+     */
+    public void sendBPMData(View view) {
+        presenter.generateAndSendBPM();
+    }
+
+    /**
+     * Start sending a BP measurement over bluetooth
+     *
+     * @param view The view that triggered this method
+     */
+    public void sendBPData(View view) {
+        presenter.generateAndSendBP();
+    }
+
+    /**
+     * Disconnect from the device
+     *
+     * @param view The view that triggered this method
+     */
+    public void doneSendingData(View view) {
+        presenter.disconnectFromDevice();
     }
 }

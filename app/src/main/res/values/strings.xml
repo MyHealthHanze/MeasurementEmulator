@@ -3,9 +3,11 @@
 
     <string name="action_settings">Settings</string>
     <string name="bluetooth_string">Bluetooth</string>
-    <string name="send_data">Send data</string>
+    <string name="send_ecg_data">Send ECG</string>
     <string name="waiting_connection">Waiting for an incoming connection</string>
     <string name="connected_to">"You are now connected to "</string>
     <string name="press">"Press "</string>
     <string name="incoming_connection">" to accept incoming connections"</string>
+    <string name="send_bpm_data">Send BPM</string>
+    <string name="send_bp_data">Send BP</string>
 </resources>

@@ -11,8 +11,10 @@ import com.google.gson.Gson;
 import com.myhealth.measurementemulator.measurementemulator.R;
 import com.myhealth.measurementemulator.measurementemulator.measurement.BP;
 import com.myhealth.measurementemulator.measurementemulator.measurement.BPM;
+import com.myhealth.measurementemulator.measurementemulator.measurement.BPMMeasurement;
+import com.myhealth.measurementemulator.measurementemulator.measurement.BPMeasurement;
 import com.myhealth.measurementemulator.measurementemulator.measurement.ECG;
-import com.myhealth.measurementemulator.measurementemulator.measurement.Measurement;
+import com.myhealth.measurementemulator.measurementemulator.measurement.ECGMeasurement;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -32,13 +34,15 @@ public class BluetoothPresenter {
     // The amount of time to be discoverable
     private static final int DISCOVERABLE_TIME = 30;
     //duration of ECG in deciseconds
-    private int duration = 40;
+    private static final int ECG_DURATION = 40;
     // The default status message
     private String defaultStatus;
     // The activity to manage
     private MainActivity activity;
     // The connector
     private BlueToothConnector connector;
+    // The GSon object
+    private Gson gson;
 
     /**
      * Create a bluetoothpresenter
@@ -49,6 +53,7 @@ public class BluetoothPresenter {
         this.activity = activity;
         defaultStatus = activity.getString(R.string.press) + activity.getString(R.string.bluetooth_string) + activity.getString(R.string.incoming_connection);
         activity.setStatus(defaultStatus);
+        gson = new Gson();
     }
 
     /**
@@ -73,15 +78,57 @@ public class BluetoothPresenter {
     }
 
     /**
-     * Generate data and send it
+     * Generate ECG data and send it
      */
-    public void generateAndSendData() {
-        Measurement measurement = createMeasurement();
-        Gson gson = new Gson();
-        String json = gson.toJson(measurement);
-        Log.d(TAG, json);
+    public void generateAndSendECG() {
+        ECGMeasurement ms = new ECGMeasurement();
+        List<Double> list = new ECG().getNewECG(ECG_DURATION);
+        ms.setEcg(list.toArray(new Double[list.size()]));
+        ms.setDateTime(getDateAsString());
         try {
-            connector.sendString(json);
+            connector.sendString(gson.toJson(ms));
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+        }
+    }
+
+    /**
+     * Generate BPM data and send it
+     */
+    public void generateAndSendBPM() {
+        BPMMeasurement ms = new BPMMeasurement();
+        ms.setBpm(new BPM().getNewBPM());
+        ms.setDateTime(getDateAsString());
+        try {
+            connector.sendString(gson.toJson(ms));
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+        }
+    }
+
+    /**
+     * Generate BP data and send it
+     */
+    public void generateAndSendBP() {
+        BPMeasurement ms = new BPMeasurement();
+        ms.setBp(new BP().getNewBP());
+        ms.setDateTime(getDateAsString());
+        try {
+            connector.sendString(gson.toJson(ms));
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+        }
+    }
+
+    /**
+     * Disconnect from the device
+     */
+    public void disconnectFromDevice() {
+        try {
+            connector.sendString("\n");
             connector.cancel();
         } catch (IOException e) {
             e.printStackTrace();
@@ -89,23 +136,16 @@ public class BluetoothPresenter {
         }
     }
 
-    private Measurement createMeasurement() {
-        Measurement measurement = new Measurement();
-        //generate BMP
-        measurement.setBpm(new BPM().getNewBPM());
-        //generate BP
-        measurement.setBp(new BP().getNewBP());
-        //generate ECG
-        List<Double> list = new ECG().getNewECG(duration);
-        Double[] ecgArray = list.toArray(new Double[list.size()]);
-        measurement.setEcg(ecgArray);
-        // Get the date and time
+    /**
+     * Get the current date and time as a String
+     *
+     * @return The current date and time as a String
+     */
+    private String getDateAsString() {
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
         dateFormatter.setLenient(false);
-        measurement.setDateTime(dateFormatter.format(new Date()));
-        return measurement;
+        return dateFormatter.format(new Date());
     }
-
 
     /**
      * Inner class to handle an incoming connection
@@ -144,12 +184,11 @@ public class BluetoothPresenter {
          * @param data The data to send
          */
         public void sendString(String data) throws IOException {
-            if (!data.endsWith("\n")) {
-                data += "\n";
-            }
+            data = data.replace("\n", "") + "\n";
+//            if (!data.endsWith("\n")) {
+//                data += "\n";
+//            }
             socket.getOutputStream().write(data.getBytes());
-            // Always send an empty line to let the other side know we're done
-            socket.getOutputStream().write("\n".getBytes());
         }
 
         /**
