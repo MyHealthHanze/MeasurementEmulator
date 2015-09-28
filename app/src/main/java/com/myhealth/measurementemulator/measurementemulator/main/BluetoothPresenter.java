@@ -83,8 +83,8 @@ public class BluetoothPresenter {
     public void generateAndSendECG() {
         ECGMeasurement ms = new ECGMeasurement();
         List<Double> list = new ECG().getNewECG(ECG_DURATION);
-        ms.setEcg(list.toArray(new Double[list.size()]));
-        ms.setDateTime(getDateAsString());
+        ms.setMeasurementValue(list.toArray(new Double[list.size()]));
+        ms.setMeasurementDate(getDateAsString());
         try {
             connector.sendString(gson.toJson(ms));
         } catch (IOException e) {
@@ -98,8 +98,8 @@ public class BluetoothPresenter {
      */
     public void generateAndSendBPM() {
         BPMMeasurement ms = new BPMMeasurement();
-        ms.setBpm(new BPM().getNewBPM());
-        ms.setDateTime(getDateAsString());
+        ms.setMeasurementValue(new BPM().getNewBPM());
+        ms.setMeasurementDate(getDateAsString());
         try {
             connector.sendString(gson.toJson(ms));
         } catch (IOException e) {
@@ -113,8 +113,8 @@ public class BluetoothPresenter {
      */
     public void generateAndSendBP() {
         BPMeasurement ms = new BPMeasurement();
-        ms.setBp(new BP().getNewBP());
-        ms.setDateTime(getDateAsString());
+        ms.setMeasurementValue(new BP().getNewBP());
+        ms.setMeasurementDate(getDateAsString());
         try {
             connector.sendString(gson.toJson(ms));
         } catch (IOException e) {

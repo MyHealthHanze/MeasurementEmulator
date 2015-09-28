@@ -7,24 +7,24 @@ package com.myhealth.measurementemulator.measurementemulator.measurement;
 public class BaseMeasurement {
 
     // The date and time of the measurement
-    private String dateTime;
+    private String measurementDate;
 
     /**
      * Get the date and time of the measurement
      *
      * @return The date and time
      */
-    public String getDateTime() {
-        return dateTime;
+    public String getMeasurementDate() {
+        return measurementDate;
     }
 
     /**
      * Set the date and time of the measurement
      *
-     * @param dateTime The date and time
+     * @param measurementDate The date and time
      */
-    public void setDateTime(String dateTime) {
-        this.dateTime = dateTime;
+    public void setMeasurementDate(String measurementDate) {
+        this.measurementDate = measurementDate;
     }
 
 }

@@ -6,23 +6,23 @@ package com.myhealth.measurementemulator.measurementemulator.measurement;
  */
 public class BPMMeasurement extends BaseMeasurement {
     // The BPM
-    private int bpm;
+    private int measurementValue;
 
     /**
      * Get the BPM
      *
      * @return The BPM
      */
-    public int getBpm() {
-        return this.bpm;
+    public int getMeasurementValue() {
+        return this.measurementValue;
     }
 
     /**
      * Set the BPM
      *
-     * @param bpm The new BPM
+     * @param measurementValue The new BPM
      */
-    public void setBpm(int bpm) {
-        this.bpm = bpm;
+    public void setMeasurementValue(int measurementValue) {
+        this.measurementValue = measurementValue;
     }
 }

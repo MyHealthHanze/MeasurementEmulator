@@ -7,24 +7,24 @@ package com.myhealth.measurementemulator.measurementemulator.measurement;
 public class ECGMeasurement extends BaseMeasurement {
 
     // The ECG
-    private Double[] ecg;
+    private Double[] measurementValue;
 
     /**
      * Get the ECG
      *
      * @return The eCG
      */
-    public Double[] getEcg() {
-        return this.ecg;
+    public Double[] getMeasurementValue() {
+        return this.measurementValue;
     }
 
     /**
      * Set the ECT
      *
-     * @param ecg The new ECG
+     * @param measurementValue The new ECG
      */
-    public void setEcg(Double[] ecg) {
-        this.ecg = ecg;
+    public void setMeasurementValue(Double[] measurementValue) {
+        this.measurementValue = measurementValue;
     }
 
 

@@ -6,24 +6,24 @@ package com.myhealth.measurementemulator.measurementemulator.measurement;
  */
 public class BPMeasurement extends BaseMeasurement {
     // The BP. The first position is systolic, the second diastolic
-    private int[] bp;
+    private int[] measurementValue;
 
     /**
      * Get the BP
      *
      * @return the BP
      */
-    public int[] getBp() {
-        return this.bp;
+    public int[] getMeasurementValue() {
+        return this.measurementValue;
     }
 
     /**
      * Set the BP
      *
-     * @param bp the new BP
+     * @param measurementValue the new BP
      */
-    public void setBp(int[] bp) {
-        this.bp = bp;
+    public void setMeasurementValue(int[] measurementValue) {
+        this.measurementValue = measurementValue;
     }
 
 }
