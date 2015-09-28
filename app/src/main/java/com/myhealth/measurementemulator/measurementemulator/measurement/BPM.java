@@ -1,4 +1,4 @@
-package com.myhealth.measurementemulator.measurementemulator;
+package com.myhealth.measurementemulator.measurementemulator.measurement;
 
 import java.util.Random;
 
@@ -7,11 +7,13 @@ import java.util.Random;
  * A class to generate random Beats per minute values.
  */
 public class BPM {
+
     private static final int MINIMUM_BPM = 35;
     private static final int MAXIMUM_BPM = 130;
 
     /**
      * Generates random BPM values.
+     *
      * @return a random  BPM value.
      */
     public int getNewBPM(){

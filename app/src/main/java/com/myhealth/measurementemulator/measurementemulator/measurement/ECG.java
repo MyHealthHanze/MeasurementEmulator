@@ -1,4 +1,4 @@
-package com.myhealth.measurementemulator.measurementemulator;
+package com.myhealth.measurementemulator.measurementemulator.measurement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,8 @@ public class ECG {
 
     /**
      * generates a new random ECG
-     * @param maxDuration
+     *
+     * @param maxDuration The maximum duration of the ECG
      * @return a randomly generated ECG
      */
     public List<Double> getNewECG(int maxDuration){
@@ -49,7 +50,8 @@ public class ECG {
 
     /**
      * Adds a pause to the current timeline.
-     * @param minimumLength
+     *
+     * @param minimumLength The minimum lenght of the pause
      */
     private void generatePause(int minimumLength) {
         double pauseLength = minimumLength + random.nextDouble()*10;
@@ -78,22 +80,22 @@ public class ECG {
      * Adds a QRS complex to the current timeline saved in values.
      */
     private void generateQRSComplex( ) {
-        double hight = 0.0;
+        double height;
         int speed = 14 - random.nextInt(6);
         int n = 0;//counting how many times the line y=0 has been crossed
         for(double i = 0.0; i<50; i++){
-            hight = EVERAGE_QRS*Math.sin(speed*(i/MEASURES_PER_DECISECOND))+(0.75*EVERAGE_QRS);
+            height = EVERAGE_QRS * Math.sin(speed * (i / MEASURES_PER_DECISECOND)) + (0.75 * EVERAGE_QRS);
             if(values.size() < maxDuration){
-                if(hight<=0 && n < 2){ //searching first drop
-                    values.add(hight);
+                if (height <= 0 && n < 2) { //searching first drop
+                    values.add(height);
                     n = 1;
-                } else if(hight>=0 && n < 3 && n > 0){//searching first spike
-                    values.add(hight);
+                } else if (height >= 0 && n < 3 && n > 0) {//searching first spike
+                    values.add(height);
                     n = 2;
-                } else if(hight<=0 && n < 4 && n > 1){//searching second drop*/
-                    values.add(hight-(0.15*EVERAGE_QRS));
+                } else if (height <= 0 && n < 4 && n > 1) {//searching second drop*/
+                    values.add(height - (0.15 * EVERAGE_QRS));
                     n = 3;
-                } else if (hight>=0 && n >= 3){
+                } else if (height >= 0 && n >= 3) {
                     values.add(0.0);
                     break;
                 }
@@ -110,17 +112,18 @@ public class ECG {
 
     /**
      * Adds a wave with a given hight and speed to the timeline.
+     *
      * @param speed the speed of the wave (duration).
-     * @param waveHight hight of the wave.
+     * @param waveHeight hight of the wave.
      */
-    private void createWave(int speed, int waveHight) {
-        double hight = 0.0;
+    private void createWave(int speed, int waveHeight) {
+        double height;
         speed = 14 - random.nextInt(speed) - 3;
         for(double i = 0.0; i<20; i++){
-            hight = waveHight*Math.sin(speed*(i/MEASURES_PER_DECISECOND));
+            height = waveHeight * Math.sin(speed * (i / MEASURES_PER_DECISECOND));
             if(values.size() < maxDuration){
-                if(hight>=0){
-                    values.add(hight);
+                if (height >= 0) {
+                    values.add(height);
                 } else{
                     values.add(0.0);
                     i = 20;

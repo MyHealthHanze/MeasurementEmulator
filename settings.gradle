@@ -1,2 +1,2 @@
-include ':app', ':gson-2.2.2'
+include ':gson-2.2.2', ':app'
 project(':gson-2.2.2').projectDir = new File('app/libs/gson-2.2.2')

@@ -1,4 +1,4 @@
-package com.myhealth.measurementemulator.measurementemulator;
+package com.myhealth.measurementemulator.measurementemulator.measurement;
 
 import java.util.Random;
 
@@ -13,6 +13,7 @@ public class BP {
 
     /**
      * generates random blood pressure values.
+     *
      * @return randomly generated BP value
      */
     public int[] getNewBP(){
