@@ -9,6 +9,13 @@ public class BPMeasurement extends BaseMeasurement {
     private int[] measurementValue;
 
     /**
+     * Default constructor
+     */
+    public BPMeasurement() {
+        super("bp");
+    }
+
+    /**
      * Get the BP
      *
      * @return the BP

@@ -10,6 +10,13 @@ public class ECGMeasurement extends BaseMeasurement {
     private Double[] measurementValue;
 
     /**
+     * Default constructor
+     */
+    public ECGMeasurement() {
+        super("ecg");
+    }
+
+    /**
      * Get the ECG
      *
      * @return The eCG

@@ -8,6 +8,12 @@ public class BaseMeasurement {
 
     // The date and time of the measurement
     private String measurementDate;
+    // The type of the measurement
+    private String type;
+
+    public BaseMeasurement(String type) {
+        setType(type);
+    }
 
     /**
      * Get the date and time of the measurement
@@ -25,6 +31,24 @@ public class BaseMeasurement {
      */
     public void setMeasurementDate(String measurementDate) {
         this.measurementDate = measurementDate;
+    }
+
+    /**
+     * Get the type
+     *
+     * @return The type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * Set the type
+     *
+     * @param type The type
+     */
+    public void setType(String type) {
+        this.type = type;
     }
 
 }

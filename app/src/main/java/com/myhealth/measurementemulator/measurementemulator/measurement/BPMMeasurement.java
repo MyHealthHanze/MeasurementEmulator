@@ -9,6 +9,13 @@ public class BPMMeasurement extends BaseMeasurement {
     private int measurementValue;
 
     /**
+     * Default constructor
+     */
+    public BPMMeasurement() {
+        super("bpm");
+    }
+
+    /**
      * Get the BPM
      *
      * @return The BPM
