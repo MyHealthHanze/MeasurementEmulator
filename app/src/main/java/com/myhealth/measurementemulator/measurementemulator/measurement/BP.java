@@ -13,6 +13,7 @@ public class BP {
 
     /**
      * generates random blood pressure values.
+     *
      * @return randomly generated BP value
      */
     public int[] getNewBP(){

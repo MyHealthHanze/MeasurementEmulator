@@ -29,6 +29,7 @@ public class ECG {
 
     /**
      * generates a new random ECG
+     *
      * @param maxDuration The maximum duration of the ECG
      * @return a randomly generated ECG
      */
@@ -49,6 +50,7 @@ public class ECG {
 
     /**
      * Adds a pause to the current timeline.
+     *
      * @param minimumLength The minimum lenght of the pause
      */
     private void generatePause(int minimumLength) {
@@ -110,6 +112,7 @@ public class ECG {
 
     /**
      * Adds a wave with a given hight and speed to the timeline.
+     *
      * @param speed the speed of the wave (duration).
      * @param waveHeight hight of the wave.
      */
