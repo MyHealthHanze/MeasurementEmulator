@@ -10,4 +10,5 @@
     <string name="incoming_connection">" to accept incoming connections"</string>
     <string name="send_bpm_data">Send BPM</string>
     <string name="send_bp_data">Send BP</string>
+    <string name="timeout_reached">"Time out reached. "</string>
 </resources>

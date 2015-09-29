@@ -173,6 +173,7 @@ public class BluetoothPresenter {
                 activity.setSendDataVisibility(View.VISIBLE);
                 activity.setStatus(activity.getString(R.string.connected_to) + socket.getRemoteDevice().getName());
             } catch (IOException e) {
+                activity.setStatus(activity.getString(R.string.timeout_reached) + activity.getString(R.string.press) + activity.getString(R.string.bluetooth_string) + activity.getString(R.string.incoming_connection));
                 cancel();
                 Log.d(TAG, e.toString());
             }
