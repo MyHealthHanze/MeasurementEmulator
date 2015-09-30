@@ -1,4 +1,4 @@
-package com.myhealth.measurementemulator.measurementemulator;
+package com.myhealth.measurementemulator.measurementemulator.main;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
@@ -7,7 +7,20 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 
+import com.google.gson.Gson;
+import com.myhealth.measurementemulator.measurementemulator.R;
+import com.myhealth.measurementemulator.measurementemulator.measurement.BP;
+import com.myhealth.measurementemulator.measurementemulator.measurement.BPM;
+import com.myhealth.measurementemulator.measurementemulator.measurement.BPMMeasurement;
+import com.myhealth.measurementemulator.measurementemulator.measurement.BPMeasurement;
+import com.myhealth.measurementemulator.measurementemulator.measurement.ECG;
+import com.myhealth.measurementemulator.measurementemulator.measurement.ECGMeasurement;
+
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -20,12 +33,16 @@ public class BluetoothPresenter {
     private static final String TAG = MainActivity.class.getSimpleName();
     // The amount of time to be discoverable
     private static final int DISCOVERABLE_TIME = 30;
+    //duration of ECG in deciseconds
+    private static final int ECG_DURATION = 40;
     // The default status message
     private String defaultStatus;
     // The activity to manage
     private MainActivity activity;
     // The connector
     private BlueToothConnector connector;
+    // The GSon object
+    private Gson gson;
 
     /**
      * Create a bluetoothpresenter
@@ -36,6 +53,7 @@ public class BluetoothPresenter {
         this.activity = activity;
         defaultStatus = activity.getString(R.string.press) + activity.getString(R.string.bluetooth_string) + activity.getString(R.string.incoming_connection);
         activity.setStatus(defaultStatus);
+        gson = new Gson();
     }
 
     /**
@@ -60,17 +78,74 @@ public class BluetoothPresenter {
     }
 
     /**
-     * Generate data and send it
+     * Generate ECG data and send it
      */
-    public void generateData() {
+    public void generateAndSendECG() {
+        ECGMeasurement ms = new ECGMeasurement();
+        List<Double> list = new ECG().getNewECG(ECG_DURATION);
+        ms.setMeasurementValue(list.toArray(new Double[list.size()]));
+        ms.setMeasurementDate(getDateAsString());
         try {
-            connector.sendString("Hello again from the other device\n");
-            connector.cancel();
+            connector.sendString(gson.toJson(ms));
         } catch (IOException e) {
-            // Do nothing
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
         }
     }
 
+    /**
+     * Generate BPM data and send it
+     */
+    public void generateAndSendBPM() {
+        BPMMeasurement ms = new BPMMeasurement();
+        ms.setMeasurementValue(new BPM().getNewBPM());
+        ms.setMeasurementDate(getDateAsString());
+        try {
+            connector.sendString(gson.toJson(ms));
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+        }
+    }
+
+    /**
+     * Generate BP data and send it
+     */
+    public void generateAndSendBP() {
+        BPMeasurement ms = new BPMeasurement();
+        ms.setMeasurementValue(new BP().getNewBP());
+        ms.setMeasurementDate(getDateAsString());
+        try {
+            connector.sendString(gson.toJson(ms));
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+        }
+    }
+
+    /**
+     * Disconnect from the device
+     */
+    public void disconnectFromDevice() {
+        try {
+            connector.sendString("\n");
+            connector.cancel();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+        }
+    }
+
+    /**
+     * Get the current date and time as a String
+     *
+     * @return The current date and time as a String
+     */
+    private String getDateAsString() {
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        dateFormatter.setLenient(false);
+        return dateFormatter.format(new Date());
+    }
 
     /**
      * Inner class to handle an incoming connection
@@ -98,7 +173,9 @@ public class BluetoothPresenter {
                 activity.setSendDataVisibility(View.VISIBLE);
                 activity.setStatus(activity.getString(R.string.connected_to) + socket.getRemoteDevice().getName());
             } catch (IOException e) {
-                Log.d(TAG, e.getMessage());
+                activity.setStatus(activity.getString(R.string.timeout_reached) + activity.getString(R.string.press) + activity.getString(R.string.bluetooth_string) + activity.getString(R.string.incoming_connection));
+                cancel();
+                Log.d(TAG, e.toString());
             }
         }
 
@@ -108,6 +185,10 @@ public class BluetoothPresenter {
          * @param data The data to send
          */
         public void sendString(String data) throws IOException {
+            data = data.replace("\n", "") + "\n";
+//            if (!data.endsWith("\n")) {
+//                data += "\n";
+//            }
             socket.getOutputStream().write(data.getBytes());
         }
 

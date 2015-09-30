@@ -18,20 +18,50 @@
         android:text="@string/bluetooth_string" />
 
     <Button
-        android:id="@+id/send_button"
+        android:id="@+id/send_ecg_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/bluetooth_button"
         android:layout_centerHorizontal="true"
-        android:onClick="sendGeneratedData"
-        android:text="@string/send_data"
+        android:onClick="sendECGData"
+        android:text="@string/send_ecg_data"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/send_bpm_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/send_ecg_button"
+        android:layout_centerHorizontal="true"
+        android:onClick="sendBPMData"
+        android:text="@string/send_bpm_data"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/send_bp_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/send_bpm_button"
+        android:layout_centerHorizontal="true"
+        android:onClick="sendBPData"
+        android:text="@string/send_bp_data"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/done_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/send_bp_button"
+        android:layout_centerHorizontal="true"
+        android:onClick="doneSendingData"
+        android:text="Done"
         android:visibility="invisible" />
 
     <TextView
         android:id="@+id/status_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/send_button"
+        android:layout_below="@+id/done_button"
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearance" />
